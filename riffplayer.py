@@ -29,17 +29,21 @@ def toggle_shuffle(shuffle_state):
     if shuffle_state == None:
         print("Shuffle not set: player idle")
     else:
+        shuffle_led.value = int(not shuffle_state)
         sp.shuffle(not shuffle_state, device_id=DEVICE_ID)
         print("Shuffle set to " + str(not shuffle_state))
 
 def cycle_repeat(repeat_state):
     if repeat_state == 'off':
+        repeat_leds.value = (1, 0)
         sp.repeat('context', device_id=DEVICE_ID)
         print("Repeat set to 'context'")
     elif repeat_state == 'context':
+        repeat_leds.value = (1, 1)
         sp.repeat('track', device_id=DEVICE_ID)
         print("Repeat set to 'track'")
     elif repeat_state == 'track':
+        repeat_leds.value = (0, 0)
         sp.repeat('off', device_id=DEVICE_ID)
         print("Repeat set to 'off'")
     elif repeat_state == None:
