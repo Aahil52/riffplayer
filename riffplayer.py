@@ -6,16 +6,16 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 def update_indicator_leds(curr_plbk):
-    if curr_plbk['shuffle_state'] == False:
-        shuffle_led.off()
-    elif curr_plbk['shuffle_state'] == True:
+    if curr_plbk['shuffle_state'] == True:
         shuffle_led.on()
-    if curr_plbk['repeat_state'] == 'off':
-        repeat_leds.value = (0, 0)
-    elif curr_plbk['repeat_state'] == 'context':
+    else:
+        shuffle_led.off()
+    if curr_plbk['repeat_state'] == 'context':
         repeat_leds.value = (1, 0)
     elif curr_plbk['repeat_state'] == 'track':
         repeat_leds.value = (1, 1)
+    else:
+        repeat_leds.value = (0, 0)
 
 def toggle_playback(is_playing):
     if is_playing == False:
@@ -27,7 +27,7 @@ def toggle_playback(is_playing):
 
 def toggle_shuffle(shuffle_state):
     if shuffle_state == None:
-        print("Shuffle not set: player idle")
+        print("Shuffle not set: player inactive")
     else:
         shuffle_led.value = int(not shuffle_state)
         sp.shuffle(not shuffle_state, device_id=DEVICE_ID)
@@ -47,7 +47,7 @@ def cycle_repeat(repeat_state):
         sp.repeat('off', device_id=DEVICE_ID)
         print("Repeat set to 'off'")
     elif repeat_state == None:
-        print("Repeat not set: player idle")
+        print("Repeat not set: player inactive")
 
 def playback_control(curr_plbk):
     if toggle_playback_btn.is_pressed:
