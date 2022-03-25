@@ -26,7 +26,7 @@ def toggle_playback(is_playing):
         print("Playback paused")
 
 def toggle_shuffle(shuffle_state):
-    if shuffle_state == 'idle':
+    if shuffle_state == None:
         print("Shuffle not set: player idle")
     else:
         sp.shuffle(not shuffle_state, device_id=DEVICE_ID)
@@ -42,7 +42,7 @@ def cycle_repeat(repeat_state):
     elif repeat_state == 'track':
         sp.repeat('off', device_id=DEVICE_ID)
         print("Repeat set to 'off'")
-    elif repeat_state == 'idle':
+    elif repeat_state == None:
         print("Repeat not set: player idle")
 
 def playback_control(curr_plbk):
@@ -82,7 +82,7 @@ while True:
             curr_plbk = sp.current_playback(market='US')
             if curr_plbk == None:
                 # Assume these values
-                curr_plbk = {'is_playing': False, 'repeat_state': 'idle', 'shuffle_state': 'idle'}
+                curr_plbk = {'is_playing': False, 'shuffle_state': None, 'repeat_state': None}
 
             update_indicator_leds(curr_plbk)
             playback_control(curr_plbk)
