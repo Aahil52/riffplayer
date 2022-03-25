@@ -8,7 +8,7 @@ from spotipy.oauth2 import SpotifyOAuth
 def update_indicator_leds(curr_plbk):
     if curr_plbk['shuffle_state'] == False:
         shuffle_led.off()
-    else:
+    elif curr_plbk['shuffle_state'] == True:
         shuffle_led.on()
     if curr_plbk['repeat_state'] == 'off':
         repeat_leds.value = (0, 0)
@@ -24,6 +24,17 @@ def toggle_playback(is_playing):
     else:
         sp.pause_playback(device_id=DEVICE_ID)
         print("Playback paused")
+
+def previous(progress_ms, id):
+    if progress_ms == None:
+        print("Nothing done: player idle")
+    elif progress_ms > 1000:
+        uri = 'spotify:track:' + id
+        sp.start_playback(device_id=DEVICE_ID, uris=[uri])
+        print("Track restarted")
+    else:
+        sp.previous_track(device_id=DEVICE_ID)
+        print("Back to previous track")
 
 def toggle_shuffle(shuffle_state):
     if shuffle_state == None:
@@ -52,8 +63,7 @@ def playback_control(curr_plbk):
         sp.next_track(device_id=DEVICE_ID)
         print("Skipped to next track")
     elif previous_btn.is_pressed:
-        sp.previous_track(device_id=DEVICE_ID)
-        print("Back to previous track")
+        previous(curr_plbk['progress_ms'], curr_plbk['item']['id'])
     elif shuffle_btn.is_pressed:
         toggle_shuffle(curr_plbk['shuffle_state'])
     elif repeat_btn.is_pressed:
@@ -82,7 +92,7 @@ while True:
             curr_plbk = sp.current_playback(market='US')
             if curr_plbk == None:
                 # Assume these values
-                curr_plbk = {'is_playing': False, 'shuffle_state': None, 'repeat_state': None}
+                curr_plbk = {'is_playing': False, 'shuffle_state': None, 'repeat_state': None, 'progress_ms': None, 'item': {'id': None}}
 
             update_indicator_leds(curr_plbk)
             playback_control(curr_plbk)
