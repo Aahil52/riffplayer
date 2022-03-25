@@ -8,16 +8,21 @@ from spotipy.oauth2 import SpotifyOAuth
 def toggle_playback(is_playing, device_id=None):
     if is_playing == False:
         sp.start_playback(device_id=device_id)
+        print("Playback started")
     else:
         sp.pause_playback(device_id=device_id)
+        print("Playback paused")
 
 def cycle_repeat(repeat_state, device_id=None):
     if repeat_state == 'off':
         sp.repeat('context', device_id=device_id)
+        print("Repeat set to 'context'")
     elif repeat_state == 'context':
         sp.repeat('track', device_id=device_id)
+        print("Repeat set to 'track'")
     elif repeat_state == 'track':
         sp.repeat('off', device_id=device_id)
+        print("Repeat set to 'off'")
 
 CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
 CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
@@ -45,10 +50,13 @@ while True:
                 toggle_playback(curr_plbk['is_playing'], device_id=DEVICE_ID)
             elif next_btn.is_pressed:
                 sp.next_track(device_id=DEVICE_ID)
+                print("Skipped to next track")
             elif previous_btn.is_pressed:
                 sp.previous_track(device_id=DEVICE_ID)
+                print("Back to previous track")
             elif shuffle_btn.is_pressed:
                 sp.shuffle(not curr_plbk['shuffle_state'], device_id=DEVICE_ID)
+                print("Shuffle set to " + str(not curr_plbk['shuffle_state']))
             elif repeat_btn.is_pressed:
                 cycle_repeat(curr_plbk['repeat_state'], device_id=DEVICE_ID)
     except Exception as e:
