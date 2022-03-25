@@ -5,23 +5,23 @@ from gpiozero import LEDBoard
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
-def toggle_playback(is_playing, device_id=None):
+def toggle_playback(is_playing):
     if is_playing == False:
-        sp.start_playback(device_id=device_id)
+        sp.start_playback(device_id=DEVICE_ID)
         print("Playback started")
     else:
-        sp.pause_playback(device_id=device_id)
+        sp.pause_playback(device_id=DEVICE_ID)
         print("Playback paused")
 
-def cycle_repeat(repeat_state, device_id=None):
+def cycle_repeat(repeat_state):
     if repeat_state == 'off':
-        sp.repeat('context', device_id=device_id)
+        sp.repeat('context', device_id=DEVICE_ID)
         print("Repeat set to 'context'")
     elif repeat_state == 'context':
-        sp.repeat('track', device_id=device_id)
+        sp.repeat('track', device_id=DEVICE_ID)
         print("Repeat set to 'track'")
     elif repeat_state == 'track':
-        sp.repeat('off', device_id=device_id)
+        sp.repeat('off', device_id=DEVICE_ID)
         print("Repeat set to 'off'")
 
 CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
@@ -47,7 +47,7 @@ while True:
                 curr_plbk = {'is_playing': False, 'repeat_state': 'off', 'shuffle_state': False}
 
             if toggle_playback_btn.is_pressed:
-                toggle_playback(curr_plbk['is_playing'], device_id=DEVICE_ID)
+                toggle_playback(curr_plbk['is_playing'])
             elif next_btn.is_pressed:
                 sp.next_track(device_id=DEVICE_ID)
                 print("Skipped to next track")
@@ -58,7 +58,7 @@ while True:
                 sp.shuffle(not curr_plbk['shuffle_state'], device_id=DEVICE_ID)
                 print("Shuffle set to " + str(not curr_plbk['shuffle_state']))
             elif repeat_btn.is_pressed:
-                cycle_repeat(curr_plbk['repeat_state'], device_id=DEVICE_ID)
+                cycle_repeat(curr_plbk['repeat_state'])
     except Exception as e:
         print(e)
         pass
