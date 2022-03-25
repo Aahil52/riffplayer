@@ -24,6 +24,21 @@ def cycle_repeat(repeat_state):
         sp.repeat('off', device_id=DEVICE_ID)
         print("Repeat set to 'off'")
 
+def playback_control(curr_plbk):
+    if toggle_playback_btn.is_pressed:
+        toggle_playback(curr_plbk['is_playing'])
+    elif next_btn.is_pressed:
+        sp.next_track(device_id=DEVICE_ID)
+        print("Skipped to next track")
+    elif previous_btn.is_pressed:
+        sp.previous_track(device_id=DEVICE_ID)
+        print("Back to previous track")
+    elif shuffle_btn.is_pressed:
+        sp.shuffle(not curr_plbk['shuffle_state'], device_id=DEVICE_ID)
+        print("Shuffle set to " + str(not curr_plbk['shuffle_state']))
+    elif repeat_btn.is_pressed:
+        cycle_repeat(curr_plbk['repeat_state'])
+
 CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
 CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
 REDIRECT_URI = 'https://localhost/player'
@@ -46,19 +61,7 @@ while True:
                 # Assume these values
                 curr_plbk = {'is_playing': False, 'repeat_state': 'off', 'shuffle_state': False}
 
-            if toggle_playback_btn.is_pressed:
-                toggle_playback(curr_plbk['is_playing'])
-            elif next_btn.is_pressed:
-                sp.next_track(device_id=DEVICE_ID)
-                print("Skipped to next track")
-            elif previous_btn.is_pressed:
-                sp.previous_track(device_id=DEVICE_ID)
-                print("Back to previous track")
-            elif shuffle_btn.is_pressed:
-                sp.shuffle(not curr_plbk['shuffle_state'], device_id=DEVICE_ID)
-                print("Shuffle set to " + str(not curr_plbk['shuffle_state']))
-            elif repeat_btn.is_pressed:
-                cycle_repeat(curr_plbk['repeat_state'])
+            playback_control(curr_plbk)
     except Exception as e:
         print(e)
         pass
