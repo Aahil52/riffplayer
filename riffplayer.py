@@ -5,6 +5,18 @@ from gpiozero import LEDBoard
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
+def update_indicator_leds(curr_plbk):
+    if curr_plbk['shuffle_state'] == False:
+        shuffle_led.off()
+    else:
+        shuffle_led.on()
+    if curr_plbk['repeat_state'] == 'off':
+        repeat_leds.value = (0, 0)
+    elif curr_plbk['repeat_state'] == 'context':
+        repeat_leds.value = (1, 0)
+    elif curr_plbk['repeat_state'] == 'track':
+        repeat_leds.value = (1, 1)
+
 def toggle_playback(is_playing):
     if is_playing == False:
         sp.start_playback(device_id=DEVICE_ID)
@@ -51,6 +63,9 @@ previous_btn = Button(19)
 shuffle_btn = Button(26)
 repeat_btn = Button(5)
 
+shuffle_led = LED(21)
+repeat_leds = LEDBoard(20, 16)
+
 while True:
     try:
         sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE))
@@ -61,6 +76,7 @@ while True:
                 # Assume these values
                 curr_plbk = {'is_playing': False, 'repeat_state': 'off', 'shuffle_state': False}
 
+            update_indicator_leds(curr_plbk)
             playback_control(curr_plbk)
     except Exception as e:
         print(e)
