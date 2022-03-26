@@ -15,11 +15,15 @@ def update_indicator_leds(curr_plbk):
     elif curr_plbk['repeat_state'] == 'track':
         repeat_leds.value = (1, 1)
     else:
-        repeat_leds.value = (0, 0)
+        repeat_leds.off()
 
-def toggle_playback(is_playing):
+def toggle_playback(is_playing, curr_device_id):
     if is_playing == False:
-        sp.start_playback(device_id=DEVICE_ID)
+        # Compares current Device ID and target Device ID
+        if (curr_device_id == DEVICE_ID) | (curr_device_id == None):
+            sp.start_playback(device_id=DEVICE_ID)
+        else:
+            sp.transfer_playback(DEVICE_ID)
         print("Playback started")
     else:
         sp.pause_playback(device_id=DEVICE_ID)
@@ -51,7 +55,7 @@ def cycle_repeat(repeat_state):
 
 def playback_control(curr_plbk):
     if toggle_playback_btn.is_pressed:
-        toggle_playback(curr_plbk['is_playing'])
+        toggle_playback(curr_plbk['is_playing'], curr_plbk['device']['id'])
     elif next_btn.is_pressed:
         sp.next_track(device_id=DEVICE_ID)
         print("Skipped to next track")
@@ -65,7 +69,7 @@ def playback_control(curr_plbk):
 
 CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
 CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
-REDIRECT_URI = 'https://localhost/player'
+REDIRECT_URI = 'https://localhost/riffplayer'
 SCOPE = 'user-read-playback-state,user-modify-playback-state'
 DEVICE_ID = '0bb4d726656ae60024e260e346f6dedf33f2348d'
 
@@ -86,7 +90,7 @@ while True:
             curr_plbk = sp.current_playback(market='US')
             if curr_plbk == None:
                 # Assume these values
-                curr_plbk = {'is_playing': False, 'shuffle_state': None, 'repeat_state': None}
+                curr_plbk = {'is_playing': False, 'shuffle_state': None, 'repeat_state': None, 'device': {'id': None}}
 
             update_indicator_leds(curr_plbk)
             playback_control(curr_plbk)
