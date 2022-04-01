@@ -6,7 +6,7 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 def update_indicator_leds(curr_plbk):
-    if curr_plbk['shuffle_state'] == True:
+    if curr_plbk['shuffle_state']:
         shuffle_led.on()
     else:
         shuffle_led.off()
@@ -18,9 +18,9 @@ def update_indicator_leds(curr_plbk):
         repeat_leds.off()
 
 def toggle_playback(is_playing, curr_device_id):
-    if is_playing == False:
+    if not is_playing:
         # Compares current Device ID and target Device ID
-        if (curr_device_id == DEVICE_ID) | (curr_device_id == None):
+        if curr_device_id == DEVICE_ID or curr_device_id is None:
             sp.start_playback(device_id=DEVICE_ID)
         else:
             sp.transfer_playback(DEVICE_ID)
@@ -30,7 +30,7 @@ def toggle_playback(is_playing, curr_device_id):
         print("Playback paused")
 
 def toggle_shuffle(shuffle_state):
-    if shuffle_state == None:
+    if shuffle_state is None:
         print("Shuffle not set: player inactive")
     else:
         shuffle_led.value = int(not shuffle_state)
@@ -50,7 +50,7 @@ def cycle_repeat(repeat_state):
         repeat_leds.value = (0, 0)
         sp.repeat('off', device_id=DEVICE_ID)
         print("Repeat set to 'off'")
-    elif repeat_state == None:
+    elif repeat_state is None:
         print("Repeat not set: player inactive")
 
 def playback_control(curr_plbk):
@@ -88,7 +88,7 @@ while True:
 
         while True:
             curr_plbk = sp.current_playback(market='US')
-            if curr_plbk == None:
+            if curr_plbk is None:
                 # Assume these values
                 curr_plbk = {'is_playing': False, 'shuffle_state': None, 'repeat_state': None, 'device': {'id': None}}
 
