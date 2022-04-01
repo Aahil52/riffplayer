@@ -89,8 +89,8 @@ while True:
         while True:
             curr_plbk = sp.current_playback(market='US')
             if curr_plbk is None:
-                # Assume these values
-                curr_plbk = {'is_playing': False, 'shuffle_state': None, 'repeat_state': None, 'device': {'id': None}}
+                # Assume these values as default
+                curr_plbk = {'is_playing': None, 'shuffle_state': None, 'repeat_state': None, 'device': {'id': None}}
 
             update_indicator_leds(curr_plbk)
             playback_control(curr_plbk)
