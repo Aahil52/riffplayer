@@ -21,14 +21,14 @@ repeat_btn = Button(5)
 shuffle_led = LED(21)
 repeat_leds = LEDBoard(20, 16)
 
-def update_indicator_leds(shuffle_state, repeat_state):
-    if shuffle_state:
+def update_indicator_leds(curr_plbk):
+    if curr_plbk['shuffle_state']:
         shuffle_led.on()
     else:
         shuffle_led.off()
-    if repeat_state == 'context':
+    if curr_plbk['repeat_state'] == 'context':
         repeat_leds.value = (1, 0)
-    elif repeat_state == 'track':
+    elif curr_plbk['repeat_state'] == 'track':
         repeat_leds.value = (1, 1)
     else:
         repeat_leds.off()
@@ -92,7 +92,7 @@ while True:
                 # Assume these values
                 curr_plbk = {'is_playing': False, 'shuffle_state': None, 'repeat_state': None, 'device': {'id': None}}
 
-            update_indicator_leds(curr_plbk['shuffle_state'], curr_plbk['repeat_state'])
+            update_indicator_leds(curr_plbk)
             playback_control(curr_plbk)
     except Exception as e:
         print(e)
