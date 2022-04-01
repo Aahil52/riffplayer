@@ -18,16 +18,15 @@ def update_indicator_leds(curr_plbk):
         repeat_leds.off()
 
 def toggle_playback(is_playing, curr_device_id):
-    if not is_playing:
-        # Compares current Device ID and target Device ID
-        if curr_device_id == DEVICE_ID or curr_device_id is None:
-            sp.start_playback(device_id=DEVICE_ID)
-        else:
-            sp.transfer_playback(DEVICE_ID)
-        print("Playback started")
-    else:
+    if is_playing and curr_device_id == DEVICE_ID:
         sp.pause_playback(device_id=DEVICE_ID)
         print("Playback paused")
+    elif curr_device_id == DEVICE_ID:
+        sp.start_playback(device_id=DEVICE_ID)
+        print("Playback started")
+    else:
+        sp.transfer_playback(DEVICE_ID)
+        print("Playback transferred")
 
 def toggle_shuffle(shuffle_state):
     if shuffle_state is None:
