@@ -19,10 +19,10 @@ def update_indicator_leds(curr_plbk):
 
 def toggle_playback(is_playing, curr_device_id):
     if is_playing and curr_device_id == DEVICE_ID:
-        sp.pause_playback(device_id=DEVICE_ID)
+        sp.pause_playback()
         print("Playback paused")
     elif curr_device_id == DEVICE_ID:
-        sp.start_playback(device_id=DEVICE_ID)
+        sp.start_playback()
         print("Playback started")
     else:
         sp.transfer_playback(DEVICE_ID)
@@ -33,21 +33,21 @@ def toggle_shuffle(shuffle_state):
         print("Shuffle not set: player inactive")
     else:
         shuffle_led.value = int(not shuffle_state)
-        sp.shuffle(not shuffle_state, device_id=DEVICE_ID)
+        sp.shuffle(not shuffle_state)
         print("Shuffle set to " + str(not shuffle_state))
 
 def cycle_repeat(repeat_state):
     if repeat_state == 'off':
         repeat_leds.value = (1, 0)
-        sp.repeat('context', device_id=DEVICE_ID)
+        sp.repeat('context')
         print("Repeat set to 'context'")
     elif repeat_state == 'context':
         repeat_leds.value = (1, 1)
-        sp.repeat('track', device_id=DEVICE_ID)
+        sp.repeat('track')
         print("Repeat set to 'track'")
     elif repeat_state == 'track':
         repeat_leds.value = (0, 0)
-        sp.repeat('off', device_id=DEVICE_ID)
+        sp.repeat('off')
         print("Repeat set to 'off'")
     elif repeat_state is None:
         print("Repeat not set: player inactive")
@@ -56,10 +56,10 @@ def playback_control(curr_plbk):
     if toggle_playback_btn.is_pressed:
         toggle_playback(curr_plbk['is_playing'], curr_plbk['device']['id'])
     elif next_btn.is_pressed:
-        sp.next_track(device_id=DEVICE_ID)
+        sp.next_track()
         print("Skipped to next track")
     elif previous_btn.is_pressed:
-        sp.previous_track(device_id=DEVICE_ID)
+        sp.previous_track()
         print("Back to previous track")
     elif shuffle_btn.is_pressed:
         toggle_shuffle(curr_plbk['shuffle_state'])
