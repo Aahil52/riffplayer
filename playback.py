@@ -1,10 +1,11 @@
 import os
-from gpiozero import Button
-from gpiozero import LED
-from gpiozero import LEDBoard
+import logging
+from gpiozero import Button, LED, LEDBoard
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
+
+logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.INFO)
 
 CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
 CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
@@ -36,47 +37,47 @@ def update_indicator_leds(curr_plbk):
 def toggle_playback(is_playing, curr_device_id, target_device_id):
     if is_playing and curr_device_id == target_device_id:
         sp.pause_playback()
-        print("Playback paused")
+        logging.info("Playback paused")
     elif curr_device_id == target_device_id:
         sp.start_playback()
-        print("Playback started")
+        logging.info("Playback started")
     else:
         sp.transfer_playback(target_device_id)
-        print("Playback transferred")
+        logging.info("Playback transferred")
 
 def toggle_shuffle(shuffle_state):
     if shuffle_state is None:
-        print("Shuffle not set: player inactive")
+        logging.info("Shuffle not set: player inactive")
     else:
         shuffle_led.value = int(not shuffle_state)
         sp.shuffle(not shuffle_state)
-        print("Shuffle set to " + str(not shuffle_state))
+        logging.info("Shuffle set to " + str(not shuffle_state))
 
 def cycle_repeat(repeat_state):
     if repeat_state == 'off':
         repeat_leds.value = (1, 0)
         sp.repeat('context')
-        print("Repeat set to 'context'")
+        logging.info("Repeat set to 'context'")
     elif repeat_state == 'context':
         repeat_leds.value = (1, 1)
         sp.repeat('track')
-        print("Repeat set to 'track'")
+        logging.info("Repeat set to 'track'")
     elif repeat_state == 'track':
         repeat_leds.value = (0, 0)
         sp.repeat('off')
-        print("Repeat set to 'off'")
+        logging.info("Repeat set to 'off'")
     elif repeat_state is None:
-        print("Repeat not set: player inactive")
+        logging.info("Repeat not set: player inactive")
 
 def playback_control(curr_plbk, target_device_id=DEFAULT_DEVICE_ID):
     if toggle_playback_btn.is_pressed:
         toggle_playback(curr_plbk['is_playing'], curr_plbk['device']['id'], target_device_id)
     elif next_btn.is_pressed:
         sp.next_track()
-        print("Skipped to next track")
+        logging.info("Skipped to next track")
     elif previous_btn.is_pressed:
         sp.previous_track()
-        print("Back to previous track")
+        logging.info("Back to previous track")
     elif shuffle_btn.is_pressed:
         toggle_shuffle(curr_plbk['shuffle_state'])
     elif repeat_btn.is_pressed:
@@ -94,6 +95,5 @@ while True:
 
             update_indicator_leds(curr_plbk)
             playback_control(curr_plbk)
-    except Exception as e:
-        print(e)
+    except Exception:
         pass
