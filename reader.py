@@ -33,12 +33,14 @@ def tapped(tag):
     # Returning True prevents the device from repeatedly reading the same tag
     return True
 
+# For Elechouse PN532v1.6 at /dev/ttyS0 over UART
 clf = nfc.ContactlessFrontend('tty:S0')
 
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=os.getenv('SPOTIPY_CLIENT_ID'), client_secret=os.getenv('SPOTIPY_CLIENT_SECRET'), redirect_uri=os.getenv('SPOTIPY_REDIRECT_URI'), scope='user-read-playback-state,user-modify-playback-state'))
 
 while True:
     return_value = clf.connect(rdwr={'on-connect': tapped, 'beep-on-connect': False})
+    # clf.connect returns False on keyboard interrupt instead of exiting script
     if return_value is False:
         print("")
         break
