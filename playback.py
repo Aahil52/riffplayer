@@ -7,10 +7,6 @@ from spotipy.oauth2 import SpotifyOAuth
 
 logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.INFO)
 
-CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
-CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
-REDIRECT_URI = 'https://localhost/riffplayer'
-SCOPE = 'user-read-playback-state,user-modify-playback-state'
 DEFAULT_DEVICE_ID = '0bb4d726656ae60024e260e346f6dedf33f2348d'
 
 toggle_playback_btn = Button(13)
@@ -47,7 +43,7 @@ def toggle_playback(is_playing, curr_device_id, target_device_id):
 
 def toggle_shuffle(shuffle_state):
     if shuffle_state is None:
-        logging.info("Shuffle not set: player inactive")
+        logging.warning("Shuffle not set: player inactive")
     else:
         shuffle_led.value = int(not shuffle_state)
         sp.shuffle(not shuffle_state)
@@ -67,7 +63,7 @@ def cycle_repeat(repeat_state):
         sp.repeat('off')
         logging.info("Repeat set to 'off'")
     elif repeat_state is None:
-        logging.info("Repeat not set: player inactive")
+        logging.warning("Repeat not set: player inactive")
 
 def playback_control(curr_plbk, target_device_id=DEFAULT_DEVICE_ID):
     if toggle_playback_btn.is_pressed:
@@ -83,7 +79,7 @@ def playback_control(curr_plbk, target_device_id=DEFAULT_DEVICE_ID):
     elif repeat_btn.is_pressed:
         cycle_repeat(curr_plbk['repeat_state'])
 
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE))
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=os.getenv('SPOTIPY_CLIENT_ID'), client_secret=os.getenv('SPOTIPY_CLIENT_SECRET'), redirect_uri=os.getenv('SPOTIPY_REDIRECT_URI'), scope='user-read-playback-state,user-modify-playback-state'))
 
 while True:
     try:
