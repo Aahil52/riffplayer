@@ -83,17 +83,16 @@ def playback_control(curr_plbk, target_device_id=DEFAULT_DEVICE_ID):
     elif repeat_btn.is_pressed:
         cycle_repeat(curr_plbk['repeat_state'])
 
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE))
+
 while True:
     try:
-        sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE))
+        curr_plbk = sp.current_playback(market='US')
+        if curr_plbk is None:
+            # Assume these values as default
+            curr_plbk = {'is_playing': None, 'shuffle_state': None, 'repeat_state': None, 'device': {'id': None}}
 
-        while True:
-            curr_plbk = sp.current_playback(market='US')
-            if curr_plbk is None:
-                # Assume these values as default
-                curr_plbk = {'is_playing': None, 'shuffle_state': None, 'repeat_state': None, 'device': {'id': None}}
-
-            update_indicator_leds(curr_plbk)
-            playback_control(curr_plbk)
+        update_indicator_leds(curr_plbk)
+        playback_control(curr_plbk)
     except Exception:
         pass
