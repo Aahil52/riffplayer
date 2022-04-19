@@ -5,18 +5,7 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 
-logging.basicConfig(filename="riffplayer.log", format='%(asctime)s %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.INFO)
-
 DEFAULT_DEVICE_ID = '0bb4d726656ae60024e260e346f6dedf33f2348d'
-
-toggle_playback_btn = Button(13)
-next_btn = Button(6)
-previous_btn = Button(19)
-shuffle_btn = Button(26)
-repeat_btn = Button(5)
-
-shuffle_led = LED(21)
-repeat_leds = LEDBoard(20, 16)
 
 def update_indicator_leds(curr_plbk):
     if curr_plbk['shuffle_state']:
@@ -78,6 +67,17 @@ def playback_control(curr_plbk, target_device_id=DEFAULT_DEVICE_ID):
         toggle_shuffle(curr_plbk['shuffle_state'])
     elif repeat_btn.is_pressed:
         cycle_repeat(curr_plbk['repeat_state'])
+
+toggle_playback_btn = Button(13)
+next_btn = Button(6)
+previous_btn = Button(19)
+shuffle_btn = Button(26)
+repeat_btn = Button(5)
+
+shuffle_led = LED(21)
+repeat_leds = LEDBoard(20, 16)
+
+logging.basicConfig(filename="riffplayer.log", format='%(asctime)s %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.INFO)
 
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=os.getenv('SPOTIPY_CLIENT_ID'), client_secret=os.getenv('SPOTIPY_CLIENT_SECRET'), redirect_uri=os.getenv('SPOTIPY_REDIRECT_URI'), scope='user-read-playback-state,user-modify-playback-state'))
 
