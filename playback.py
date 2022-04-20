@@ -1,4 +1,3 @@
-import os
 import logging
 import toml
 from gpiozero import Button, LED, LEDBoard

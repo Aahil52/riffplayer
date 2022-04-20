@@ -1,4 +1,3 @@
-import os
 import logging
 import toml
 from time import sleep
