@@ -1,10 +1,14 @@
 import os
 import logging
+import toml
 from time import sleep
 import nfc
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
+def get_target_device_id():
+    with open('config.toml') as f:
+            return toml.load(f)['device']['target_device_id']
 
 def tapped(tag):
     if tag.ndef is None:
@@ -16,13 +20,13 @@ def tapped(tag):
         return
     if record.uri.startswith("spotify:track:"):
         try:
-            sp.add_to_queue(record.uri)
-            logging.info("Track added to the queue")
+            sp.start_playback(device_id=get_target_device_id(), uris=[record.uri])
+            logging.info("Track playback started")
         except Exception:
             pass
     elif record.uri.startswith("spotify:album:") or record.uri.startswith("spotify:playlist:") or record.uri.startswith("spotify:artist:"):
         try:
-            sp.start_playback(context_uri=record.uri)
+            sp.start_playback(device_id=get_target_device_id(), context_uri=record.uri)
             logging.info("Collection playback started")
         except Exception:
             pass
@@ -31,9 +35,12 @@ def tapped(tag):
     # Returning True prevents the device from repeatedly reading the same tag
     return True
 
+with open('config.toml') as f:
+    config = toml.load(f)
+
 logging.basicConfig(filename="riffplayer.log", format='%(asctime)s %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.INFO)
 
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=os.getenv('SPOTIPY_CLIENT_ID'), client_secret=os.getenv('SPOTIPY_CLIENT_SECRET'), redirect_uri=os.getenv('SPOTIPY_REDIRECT_URI'), scope='user-read-playback-state,user-modify-playback-state'))
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=config['spotipy']['client_id'], client_secret=config['spotipy']['client_secret'], redirect_uri=config['spotipy']['redirect_uri'], scope='user-read-playback-state,user-modify-playback-state'))
 
 # For Elechouse PN532v1.6 at /dev/ttyS0 over UART
 with nfc.ContactlessFrontend('tty:S0') as clf:

@@ -1,11 +1,13 @@
 import os
 import logging
+import toml
 from gpiozero import Button, LED, LEDBoard
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
-
-DEFAULT_DEVICE_ID = '0bb4d726656ae60024e260e346f6dedf33f2348d'
+def get_target_device_id():
+    with open('config.toml') as f:
+            return toml.load(f)['device']['target_device_id']
 
 def update_indicator_leds(curr_plbk):
     if curr_plbk['shuffle_state']:
@@ -19,7 +21,8 @@ def update_indicator_leds(curr_plbk):
     else:
         repeat_leds.off()
 
-def toggle_playback(is_playing, curr_device_id, target_device_id):
+def toggle_playback(is_playing, curr_device_id):
+    target_device_id = get_target_device_id()
     if is_playing and curr_device_id == target_device_id:
         sp.pause_playback()
         logging.info("Playback paused")
@@ -54,9 +57,9 @@ def cycle_repeat(repeat_state):
     elif repeat_state is None:
         logging.warning("Repeat not set: player inactive")
 
-def playback_control(curr_plbk, target_device_id=DEFAULT_DEVICE_ID):
+def playback_control(curr_plbk):
     if toggle_playback_btn.is_pressed:
-        toggle_playback(curr_plbk['is_playing'], curr_plbk['device']['id'], target_device_id)
+        toggle_playback(curr_plbk['is_playing'], curr_plbk['device']['id'])
     elif next_btn.is_pressed:
         sp.next_track()
         logging.info("Skipped to next track")
@@ -77,9 +80,12 @@ repeat_btn = Button(5)
 shuffle_led = LED(21)
 repeat_leds = LEDBoard(20, 16)
 
+with open('config.toml') as f:
+    config = toml.load(f)
+
 logging.basicConfig(filename="riffplayer.log", format='%(asctime)s %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.INFO)
 
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=os.getenv('SPOTIPY_CLIENT_ID'), client_secret=os.getenv('SPOTIPY_CLIENT_SECRET'), redirect_uri=os.getenv('SPOTIPY_REDIRECT_URI'), scope='user-read-playback-state,user-modify-playback-state'))
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=config['spotipy']['client_id'], client_secret=config['spotipy']['client_secret'], redirect_uri=config['spotipy']['redirect_uri'], scope='user-read-playback-state,user-modify-playback-state'))
 
 while True:
     try:
