@@ -42,7 +42,7 @@ logging.basicConfig(filename="riffplayer.log", format='%(asctime)s %(levelname)s
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=config['spotipy']['client_id'], client_secret=config['spotipy']['client_secret'], redirect_uri=config['spotipy']['redirect_uri'], scope='user-read-playback-state,user-modify-playback-state'))
 
 # For Elechouse PN532v1.6 at /dev/ttyS0 over UART
-with nfc.ContactlessFrontend('tty:S0') as clf:
+with nfc.ContactlessFrontend(config['reader']['path']) as clf:
     while True:
         return_value = clf.connect(rdwr={'on-connect': tapped, 'beep-on-connect': False})
         # clf.connect returns False on keyboard interrupt instead of exiting script
