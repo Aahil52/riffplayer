@@ -5,6 +5,14 @@ import nfc
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
+
+with open('config.toml') as f:
+    config = toml.load(f)
+
+logging.basicConfig(filename="riffplayer.log", format='%(asctime)s %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.INFO)
+
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=config['spotipy']['client_id'], client_secret=config['spotipy']['client_secret'], redirect_uri=config['spotipy']['redirect_uri'], scope='user-read-playback-state,user-modify-playback-state'))
+
 def get_target_device_id():
     with open('config.toml') as f:
             return toml.load(f)['device']['target_device_id']
@@ -34,19 +42,22 @@ def tapped(tag):
     # Returning True prevents the device from repeatedly reading the same tag
     return True
 
-with open('config.toml') as f:
-    config = toml.load(f)
+def main():
+    # Path determined by config
+    with nfc.ContactlessFrontend(config['reader']['path']) as clf:
+        while True:
+            rdwr_options = {
+                'on-connect': tapped,
+                'interval': 0.5,
+                'beep-on-connect': False
+            }
+            return_value = clf.connect(rdwr=rdwr_options)
+            # clf.connect returns False on keyboard interrupt instead of exiting script
+            # ** Beware, may return False on other errors **
+            if  return_value is False:
+                print("")
+                break
+            sleep(0.1)
 
-logging.basicConfig(filename="riffplayer.log", format='%(asctime)s %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.INFO)
-
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=config['spotipy']['client_id'], client_secret=config['spotipy']['client_secret'], redirect_uri=config['spotipy']['redirect_uri'], scope='user-read-playback-state,user-modify-playback-state'))
-
-# For Elechouse PN532v1.6 at /dev/ttyS0 over UART
-with nfc.ContactlessFrontend(config['reader']['path']) as clf:
-    while True:
-        return_value = clf.connect(rdwr={'on-connect': tapped, 'beep-on-connect': False})
-        # clf.connect returns False on keyboard interrupt instead of exiting script
-        if return_value is False:
-            print("")
-            break
-        sleep(0.1)
+if __name__ == '__main__':
+    main()
