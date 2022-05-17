@@ -1,3 +1,5 @@
+import os
+import sys
 import logging
 import toml
 from time import sleep
@@ -54,7 +56,7 @@ def main():
             return_value = clf.connect(rdwr=rdwr_options)
             # clf.connect returns False on keyboard interrupt instead of exiting script
             # ** Beware, may return False on other errors **
-            if  return_value is False:
+            if  return_value is False and os.getpgrp() == os.tcgetpgrp(sys.stdout.fileno()):
                 print("")
                 break
             sleep(0.1)
